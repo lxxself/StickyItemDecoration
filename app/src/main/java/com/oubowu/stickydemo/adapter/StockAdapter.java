@@ -50,6 +50,8 @@ public class StockAdapter extends RecyclerViewAdapter<StockEntity.StockInfo, Sti
                 return R.layout.item_stock_head;
             case TYPE_STICKY_HEAD:
                 return R.layout.item_stock_sticky_head;
+            case TYPE_STICKY_HEAD_1:
+                return R.layout.item_stock_sticky_head_1;
             case TYPE_DATA:
                 return R.layout.item_stock_data;
             case TYPE_SMALL_STICKY_HEAD_WITH_DATA:
@@ -64,6 +66,7 @@ public class StockAdapter extends RecyclerViewAdapter<StockEntity.StockInfo, Sti
         switch (type) {
 
             case TYPE_STICKY_HEAD:
+            case TYPE_STICKY_HEAD_1:
 
                 CheckBox checkBox = holder.getCheckBox(R.id.checkbox);
                 checkBox.setTag(position);

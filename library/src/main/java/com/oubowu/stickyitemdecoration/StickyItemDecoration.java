@@ -5,7 +5,13 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.Log;
 import android.view.View;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by lenovo on 2017/1/6.
@@ -13,7 +19,7 @@ import android.view.View;
 
 public class StickyItemDecoration extends RecyclerView.ItemDecoration {
 
-    private int mStickyHeadType;
+    private Set<Integer> mStickyHeadTypes;
     private int mFirstVisiblePosition;
     //    private int mFirstCompletelyVisiblePosition;
     private int mStickyHeadPosition;
@@ -26,13 +32,21 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
 
 
     private OnStickyChangeListener mOnStickyChangeListener;
-    public void setOnStickyChangeListener(OnStickyChangeListener onStickyChangeListener){
+
+    public void setOnStickyChangeListener(OnStickyChangeListener onStickyChangeListener) {
         this.mOnStickyChangeListener = onStickyChangeListener;
     }
 
     public StickyItemDecoration(StickyHeadContainer stickyHeadContainer, int stickyHeadType) {
         mStickyHeadContainer = stickyHeadContainer;
-        mStickyHeadType = stickyHeadType;
+        Set<Integer> list = new HashSet<>();
+        list.add(stickyHeadType);
+        mStickyHeadTypes = list;
+    }
+
+    public StickyItemDecoration(StickyHeadContainer stickyHeadContainer, Set<Integer> stickyHeadTypes) {
+        mStickyHeadContainer = stickyHeadContainer;
+        mStickyHeadTypes = stickyHeadTypes;
     }
 
 
@@ -40,6 +54,8 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
     // 1.onDraw方法先于drawChildren
     // 2.onDrawOver在drawChildren之后，一般我们选择复写其中一个即可。
     // 3.getItemOffsets 可以通过outRect.set()为每个Item设置一定的偏移量，主要用于绘制Decorator。
+
+    private View mWaitStickView = null;
 
     @Override
     public void onDraw(Canvas c, RecyclerView parent, RecyclerView.State state) {
@@ -53,21 +69,31 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
         }
 
         calculateStickyHeadPosition(parent);
-
+        Log.d("onDraw===", mFirstVisiblePosition + "--" + mStickyHeadPosition);
         if (mEnableStickyHead /*&& mFirstCompletelyVisiblePosition > mStickyHeadPosition*/ && mFirstVisiblePosition >= mStickyHeadPosition && mStickyHeadPosition != -1) {
-            View belowView = parent.findChildViewUnder(c.getWidth() / 2, mStickyHeadContainer.getChildHeight() + 0.01f);
+            Log.d("getChildHeight===", mStickyHeadContainer.getChildHeight() + "");
+            View belowView = mWaitStickView != null ? mWaitStickView : parent.findChildViewUnder(c.getWidth() / 2, mStickyHeadContainer.getChildHeight() + 0.01f);
             mStickyHeadContainer.onDataChange(mStickyHeadPosition);
             int offset;
             if (isStickyHead(parent, belowView) && belowView.getTop() > 0) {
+                if (belowView.getHeight() < mStickyHeadContainer.getChildHeight()) {
+                    mWaitStickView = belowView;
+                } else {
+                    mWaitStickView = null;
+                }
                 offset = belowView.getTop() - mStickyHeadContainer.getChildHeight();
             } else {
+                mWaitStickView = null;
                 offset = 0;
             }
-            if (mOnStickyChangeListener!=null){
+            if (offset > 0) {
+                offset = 0;
+            }
+            if (mOnStickyChangeListener != null) {
                 mOnStickyChangeListener.onScrollable(offset);
             }
         } else {
-            if (mOnStickyChangeListener!=null){
+            if (mOnStickyChangeListener != null) {
                 mOnStickyChangeListener.onInVisible();
             }
         }
@@ -123,7 +149,7 @@ public class StickyItemDecoration extends RecyclerView.ItemDecoration {
      * @return
      */
     private boolean isStickyHeadType(int type) {
-        return mStickyHeadType == type;
+        return mStickyHeadTypes.contains(type);
     }
 
     /**

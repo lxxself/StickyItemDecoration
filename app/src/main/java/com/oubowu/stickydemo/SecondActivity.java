@@ -60,18 +60,18 @@ public class SecondActivity extends AppCompatActivity {
     private void initView() {
 
         final StickyHeadContainer container = (StickyHeadContainer) findViewById(R.id.shc);
-        final TextView tvStockName = (TextView) container.findViewById(R.id.tv_stock_name);
+//        final TextView tvStockName = (TextView) container.findViewById(R.id.tv_stock_name);
         container.setDataCallback(new StickyHeadContainer.DataCallback() {
             @Override
             public void onDataChange(int pos) {
                 StockEntity.StockInfo item = mAdapter.getData().get(pos).getData();
-                tvStockName.setText(item.stickyHeadName);
+//                tvStockName.setText(item.stickyHeadName);
             }
         });
         container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(SecondActivity.this, "点击了粘性头部：" + tvStockName.getText(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SecondActivity.this, "点击了粘性头部：" + tvStockName.getText(), Toast.LENGTH_SHORT).show();
             }
         });
 

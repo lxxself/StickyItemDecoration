@@ -13,11 +13,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,6 +32,7 @@ import com.oubowu.stickydemo.adapter.StockAdapter;
 import com.oubowu.stickydemo.callback.OnItemClickListener;
 import com.oubowu.stickydemo.entitiy.StickyHeadEntity;
 import com.oubowu.stickydemo.entitiy.StockEntity;
+import com.oubowu.stickydemo.holder.RecyclerViewHolder;
 import com.oubowu.stickyitemdecoration.DividerHelper;
 import com.oubowu.stickyitemdecoration.OnStickyChangeListener;
 import com.oubowu.stickyitemdecoration.StickyHeadContainer;
@@ -38,7 +43,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -79,41 +88,49 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
 
         final StickyHeadContainer container = (StickyHeadContainer) findViewById(R.id.shc);
-        final TextView tvStockName = (TextView) container.findViewById(R.id.tv_stock_name);
-        final CheckBox checkBox = (CheckBox) container.findViewById(R.id.checkbox);
-        final ImageView more = (ImageView) container.findViewById(R.id.iv_more);
-        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                mAdapter.getData().get(mStickyPosition).getData().check = isChecked;
-                mAdapter.notifyItemChanged(mStickyPosition);
-            }
-        });
+        container.putTypeView(StockAdapter.TYPE_STICKY_HEAD, LayoutInflater.from(this).inflate(R.layout.item_stock_sticky_head, container, false));
+        container.putTypeView(StockAdapter.TYPE_STICKY_HEAD_1, LayoutInflater.from(this).inflate(R.layout.item_stock_sticky_head_1, container, false));
+//        final TextView tvStockName = (TextView) container.findViewById(R.id.tv_stock_name);
+//        final CheckBox checkBox = (CheckBox) container.findViewById(R.id.checkbox);
+//        final ImageView more = (ImageView) container.findViewById(R.id.iv_more);
+//        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                mAdapter.getData().get(mStickyPosition).getData().check = isChecked;
+//                mAdapter.notifyItemChanged(mStickyPosition);
+//            }
+//        });
         container.setDataCallback(new StickyHeadContainer.DataCallback() {
             @Override
             public void onDataChange(int pos) {
                 mStickyPosition = pos;
                 StockEntity.StockInfo item = mAdapter.getData().get(pos).getData();
-                tvStockName.setText(item.stickyHeadName);
-                checkBox.setChecked(item.check);
+                Log.d("item.getItemType===", item.getItemType() + "");
+                container.showStickType(item.getItemType());
+
+//                tvStockName.setText(item.stickyHeadName);
+//                checkBox.setChecked(item.check);
             }
         });
-        more.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "点击了粘性头部的更多", Toast.LENGTH_SHORT).show();
-            }
-        });
-        container.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "点击了粘性头部：" + tvStockName.getText(), Toast.LENGTH_SHORT).show();
-            }
-        });
+//        more.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(MainActivity.this, "点击了粘性头部的更多", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//        container.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(MainActivity.this, "点击了粘性头部：" + tvStockName.getText(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this, LinearLayoutManager.VERTICAL, false));
-        StickyItemDecoration stickyItemDecoration = new StickyItemDecoration(container, RecyclerViewAdapter.TYPE_STICKY_HEAD);
+        Set<Integer> sets = new HashSet<>();
+        sets.add(StockAdapter.TYPE_STICKY_HEAD);
+        sets.add(StockAdapter.TYPE_STICKY_HEAD_1);
+        StickyItemDecoration stickyItemDecoration = new StickyItemDecoration(container,sets);
         stickyItemDecoration.setOnStickyChangeListener(new OnStickyChangeListener() {
             @Override
             public void onScrollable(int offset) {
@@ -152,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
             data.add(info);
         }
 
-        data.add(new StockEntity.StockInfo(RecyclerViewAdapter.TYPE_STICKY_HEAD, "跌幅榜"));
+        data.add(new StockEntity.StockInfo(RecyclerViewAdapter.TYPE_STICKY_HEAD_1, "跌幅榜"));
         for (StockEntity.StockInfo info : stockEntity.down_list) {
             info.setItemType(RecyclerViewAdapter.TYPE_DATA);
             data.add(info);
@@ -164,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
             data.add(info);
         }
 
-        data.add(new StockEntity.StockInfo(RecyclerViewAdapter.TYPE_STICKY_HEAD, "振幅榜"));
+        data.add(new StockEntity.StockInfo(RecyclerViewAdapter.TYPE_STICKY_HEAD_1, "振幅榜"));
         for (StockEntity.StockInfo info : stockEntity.amplitude_list) {
             info.setItemType(RecyclerViewAdapter.TYPE_DATA);
             data.add(info);

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    android:id="@+id/content_main"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -14,23 +13,27 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
-        tools:background="@color/colorAccent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true">
+        tools:background="@color/colorAccent">
 
     </android.support.v7.widget.RecyclerView>
 
     <com.oubowu.stickyitemdecoration.StickyHeadContainer
         android:id="@+id/shc"
         android:layout_width="match_parent"
-        android:layout_margin="10dp"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
 
-        <include
-            layout="@layout/item_stock_sticky_head"/>
-
+        <!--        <include-->
+        <!--            layout="@layout/item_stock_sticky_head"/>-->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#FFEB3B"
+            android:visibility="invisible" />
     </com.oubowu.stickyitemdecoration.StickyHeadContainer>
 
 </RelativeLayout>

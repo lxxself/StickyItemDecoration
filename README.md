@@ -1,3 +1,8 @@
+
+#修改
+基于原实现修改为吸顶头部是多种样式的
+
+
 # RecyclerView粘性头部
 已适配Androidx，需要切到androidx分支即可
 
